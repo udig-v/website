@@ -1,20 +1,37 @@
-const eyes = document.querySelectorAll('.eye');
-const pupils = document.querySelectorAll('.pupil');
+document.addEventListener("mousemove", (event) => {
+  // Select all pupils
+  const pupils = document.querySelectorAll(".pupil");
+  const blackEyes = document.querySelectorAll(".black-eye");
 
-document.addEventListener('mousemove', (event) => {
-  const { clientX: mouseX, clientY: mouseY } = event;
+  // Update standard pupils
+  pupils.forEach((pupil) => {
+    const eye = pupil.closest(".eye");
+    const eyeRect = eye.getBoundingClientRect();
 
-  eyes.forEach((eye) => {
+    // Calculate the angle to move the pupil
+    const angle = Math.atan2(
+      event.clientY - (eyeRect.top + eyeRect.height / 2),
+      event.clientX - (eyeRect.left + eyeRect.width / 2)
+    );
+
+    const distance = 4; // distance the pupil should move
+    pupil.style.transform = `translate(-50%, -50%) translate(${
+      Math.cos(angle) * distance
+    }px, ${Math.sin(angle) * distance}px)`;
+  });
+
+  // Update oval-horizontal eyes
+  blackEyes.forEach((eye) => {
     const rect = eye.getBoundingClientRect();
-    const eyeCenterX = rect.left + rect.width / 2;
-    const eyeCenterY = rect.top + rect.height / 2;
+    const centerX = rect.left + rect.width / 2;
+    const centerY = rect.top + rect.height / 2;
 
-    // Calculate angle and distance
-    const angle = Math.atan2(mouseY - eyeCenterY, mouseX - eyeCenterX);
-    const distance = Math.min(10, Math.hypot(mouseX - eyeCenterX, mouseY - eyeCenterY) / 20);
+    // Use event.clientX and event.clientY for mouse coordinates
+    const angle = Math.atan2(event.clientY - centerY, event.clientX - centerX);
+    const distance = Math.min(rect.width / 4, 10); // Control max pupil movement
 
-    // Position the pupil
-    const pupil = eye.querySelector('.pupil');
-    pupil.style.transform = `translate(${Math.cos(angle) * distance}px, ${Math.sin(angle) * distance}px)`;
+    eye.style.transform = `translate(${Math.cos(angle) * distance}px, ${
+      Math.sin(angle) * distance
+    }px)`;
   });
 });
